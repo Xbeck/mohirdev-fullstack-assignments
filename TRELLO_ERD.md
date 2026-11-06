@@ -1,26 +1,47 @@
-# Trello database ER diagram
+# Trello ma’lumotlar bazasi
 
-PostgreSQL types; PK = primary key, FK = foreign key, UK = unique. Composite PKs on membership tables prevent duplicate memberships. IDs use generated identity bigint. JSONB template structure is a reusable snapshot, copied into boards/lists/cards when instantiated; later edits do not mutate existing boards.
+Bu chizma Trello kabi vazifalar boshqariladigan dastur uchun tuzilgan. Unda 12 ta jadval bor.
+
+## Asosiy jadvallar
+
+- `members` — foydalanuvchilar.
+- `workspaces` — jamoaning ish joylari.
+- `boards` — loyiha doskalari.
+- `lists` — doskadagi bo‘limlar, masalan “Bajarish kerak” va “Tayyor”.
+- `cards` — vazifalar.
+- `templates` — yangi doska uchun tayyor namunalar.
+- Qolgan jadvallar a’zolar, izohlar va vazifa ichidagi ro‘yxatlarni saqlaydi.
+
+## Belgilar
+
+- `PK` — yozuvning asosiy raqami.
+- `FK` — boshqa jadvaldagi yozuvga bog‘lanish.
+- `UK` — takrorlanmaydigan qiymat.
+- `bigint` — butun son, `varchar` va `text` — matn.
+- `boolean` — ha yoki yo‘q, `numeric` — son.
+- `timestamptz` — sana va vaqt, `jsonb` — tuzilgan ma’lumot.
+
+## Chizma
 
 ```mermaid
 erDiagram
-    members ||--o{ workspaces : owns
-    workspaces ||--o{ workspace_members : has
-    members ||--o{ workspace_members : joins
-    members ||--o{ templates : creates
-    workspaces ||--o{ boards : contains
-    templates |o--o{ boards : optional_source
-    boards ||--o{ board_members : has
-    members ||--o{ board_members : joins
-    boards ||--o{ lists : contains
-    lists ||--o{ cards : contains
-    members ||--o{ cards : creates
-    cards ||--o{ card_members : assigns
-    members ||--o{ card_members : assigned
-    cards ||--o{ comments : has
-    members ||--o{ comments : writes
-    cards ||--o{ checklists : has
-    checklists ||--o{ checklist_items : contains
+    members ||--o{ workspaces : egasi
+    workspaces ||--o{ workspace_members : bor
+    members ||--o{ workspace_members : azo
+    members ||--o{ templates : yaratadi
+    workspaces ||--o{ boards : ichida
+    templates |o--o{ boards : namuna
+    boards ||--o{ board_members : bor
+    members ||--o{ board_members : azo
+    boards ||--o{ lists : ichida
+    lists ||--o{ cards : ichida
+    members ||--o{ cards : yaratadi
+    cards ||--o{ card_members : biriktiriladi
+    members ||--o{ card_members : bajaradi
+    cards ||--o{ comments : bor
+    members ||--o{ comments : yozadi
+    cards ||--o{ checklists : bor
+    checklists ||--o{ checklist_items : ichida
     members {
         bigint id PK
         varchar name
@@ -101,14 +122,18 @@ erDiagram
 
 ```
 
-## Relations and integrity
-- Workspace owner → members.id. Workspace membership and board membership use join tables with role CHECK (`owner`, `admin`, `member`, `observer` as appropriate).
-- Board belongs to one workspace; optional template_id uses ON DELETE SET NULL. Membership in a board must also be permitted by its workspace; enforce this in the service transaction or a database trigger.
-- List belongs to board. Card belongs to list, so board/workspace are derived without redundant foreign keys. `position` controls ordering; reorder in a transaction.
-- Members may be assigned to many cards. Card assignees must be board members; service/trigger validates this. Comments reference author and card.
-- Checklists and checklist items belong to cards through their parents.
-- ON DELETE CASCADE for contained lists/cards/comments/checklists/memberships. RESTRICT deletion of workspace owner; transfer ownership first. Soft-delete members when attribution must remain.
-- Add created_at/updated_at timestamps to mutable entities. Index all FK columns, cards(due_at), lists(board_id,position), cards(list_id,position), comments(card_id,created_at).
-- email is normalized to lowercase before unique validation; role/visibility values are checked. Visibility is private/workspace/public.
+## Bog‘lanishlar qanday ishlaydi?
 
-Required domains: Workspaces, Boards, Members, Cards, Lists and Templates are all included. diagram.svg is a standalone visual; README Mermaid shows the exact FK relationship graph.
+Ish joyida bir nechta doska, doskada bir nechta bo‘lim, bo‘limda esa bir nechta vazifa bo‘ladi. Har bir vazifaga a’zolar, izohlar va bajariladigan ishlar ro‘yxati qo‘shiladi.
+
+`workspace_members`, `board_members` va `card_members` jadvallari foydalanuvchini tegishli ish joyi, doska yoki vazifaga bog‘laydi. Ularning ikki ustuni birgalikda asosiy kalit bo‘ladi. Shu sabab bir a’zo ikki marta yozilmaydi.
+
+Doska tayyor namunadan yaratilishi mumkin, lekin bu majburiy emas. Namuna o‘zgarsa, avval yaratilgan doska o‘zgarmaydi. `position` maydoni bo‘lim va vazifalar tartibini saqlaydi.
+
+Doska a’zosi ish joyiga ham kirish huquqiga ega bo‘lishi kerak. Vazifaga faqat shu doska a’zosi biriktiriladi. Bular dasturda yoki baza qoidalari orqali tekshiriladi.
+
+Email kichik harflarda saqlanadi va takrorlanmaydi. Ish joyi egasini o‘chirishdan oldin egalik boshqa a’zoga o‘tkaziladi. Ichki yozuvlar uchun o‘chirish qoidalari belgilanadi; muallif haqidagi ma’lumotni saqlash kerak bo‘lsa, foydalanuvchi faqat faol emas deb belgilanadi.
+
+Tez qidirish uchun bog‘lanish ustunlariga indeks qo‘shiladi. Yaratilgan va o‘zgartirilgan vaqtlarni ham saqlash tavsiya etiladi.
+
+Chizmaning alohida nusxasi `diagram.svg`, Mermaid matni esa `diagram.mmd` faylida.

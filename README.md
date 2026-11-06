@@ -1,22 +1,37 @@
-# Python Fullstack — amaliy loyihalar
+# Python Fullstack loyihalari
 
-Har bir ZIP ichida alohida loyiha, README va kerakli kodlar mavjud. ZIP faylini ochib **Download raw file** orqali yuklab oling, arxivdan chiqaring va ichidagi README bo‘yicha ishga tushiring.
+Bu yerda kurs uchun tayyorlangan oltita o‘quv loyihasi bor.
 
-| Topshiriq | Loyiha |
+| Loyiha | Fayl |
 |---|---|
-| Bootstrap: Basic, Forms, Tables | [bootstrap.zip](bootstrap.zip) |
-| Trello ma’lumotlar bazasi | [ER diagram](TRELLO_ERD.md), [SVG](diagram.svg), [trello.zip](trello.zip) |
-| Contact Form va /xabarlar | [contact_form.zip](contact_form.zip) |
-| Omborxona FIFO API | [warehouse.zip](warehouse.zip) — namuna SQLite bazasi bilan |
+| Bootstrap sahifalari | [bootstrap.zip](bootstrap.zip) |
+| Trello bazasi chizmasi | [Chizmani ko‘rish](TRELLO_ERD.md) · [trello.zip](trello.zip) |
+| Xabar yuborish formasi | [contact_form.zip](contact_form.zip) |
+| Omborxona hisobi | [warehouse.zip](warehouse.zip) |
 | Django blog | [blog.zip](blog.zip) |
-| FastAPI qarz monitoringi | [debt_api.zip](debt_api.zip) |
+| Qarzlarni hisoblash | [debt_api.zip](debt_api.zip) |
 
-Kodlar brauzerda tekshirish uchun [SOURCE_FILES.json](SOURCE_FILES.json) ichida ham to‘liq mavjud. `python extract_sources.py` ularni `source/` ichiga alohida fayllar qilib chiqaradi (Python standart kutubxonasi, tashqi bog‘liqliksiz). Warehouse namunaviy bazasi ZIP ichida; manba orqali ishga tushirganda `python manage.py seed` bilan yaratiladi.
+## Qanday ochiladi?
 
-## Tekshirish
-- Contact Form: 2 Django test — saqlash, redirect, validatsiya, CSRF va HTML escape.
-- Omborxona: 2 Django test — umumiy zaxira, yetishmovchilik, DB o‘zgarmasligi, xato so‘rovlar.
-- Blog: 2 Django test — moderatsiya, izoh, auth, ko‘rishlar va saralash sahifalari.
-- Qarz API: 3 unittest — auth/settings, CRUD/filter/monitoring, foydalanuvchilar izolyatsiyasi/validatsiya. SQLite test muhiti; PostgreSQL integratsiyasi bu kompyuterda ishga tushirilmagan. PostgreSQL sozlamasi va Docker Compose berilgan.
+1. Kerakli ZIP faylini oching.
+2. `Download raw file` tugmasi orqali yuklab oling.
+3. Arxivni oching.
+4. Ichidagi `README.md` yo‘riqnomasiga amal qiling.
 
-Bu o‘quv loyihalari AI yordamida tayyorlangan. Lokal demo sozlamalari ishlatilgan; haqiqiy shaxsiy ma’lumotlar kiritilmagan. Ishlab chiqarish muhiti uchun har bir README dagi sozlash talablarini bajaring.
+Har bir loyihaning ishga tushirish tartibi o‘z README faylida yozilgan.
+
+## Kodlarni ko‘rish
+
+Barcha matnli kodlar [SOURCE_FILES.json](SOURCE_FILES.json) faylida ham bor. Ularni alohida fayllarga ajratish uchun shu fayl va [extract_sources.py](extract_sources.py) ni bitta papkaga yuklab oling. Keyin bajaring:
+
+```sh
+python extract_sources.py
+```
+
+Kodlar `source` papkasiga chiqadi. Omborxonaning namuna bazasi ZIP ichida bor; koddan boshlansa, `python manage.py seed` bilan yaratiladi.
+
+## Tekshirish natijasi
+
+Contact Form, omborxona va blogda ikkitadan, qarzlar loyihasida uchta test o‘tgan. Bootstrap sahifalari brauzerda tekshirilgan. Qarzlar loyihasining PostgreSQL bilan alohida tekshiruvi bajarilmagan.
+
+Loyihalar AI yordamida tayyorlangan. Ular o‘rganish va kompyuterda sinab ko‘rish uchun mo‘ljallangan.
